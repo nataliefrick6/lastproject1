@@ -1,0 +1,117 @@
+---
+title: Will Adrian Martinez Satisfy K-State Fans?
+author: Natalie Frick
+date: '2022-04-06'
+slug: will-adrian-martinez-satisfy-k-state-fans
+categories: []
+tags: []
+---
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+library(tidyverse)
+library(ggalt)
+library(scales)
+library(waffle)
+library(lubridate)
+library(janitor)
+library(ggrepel)
+```
+Skylar Thompson, the QB for Kamsas State University since 2017, created quite the fan base among Wildcat fans during his five seasons with the university. Thompson's last year of eligibility with K-State was 2021 and Wildcat fans were anxious to find out who would be replacing him. 
+
+After spending four years at the University of Nebraska-Lincoln, quarterback Adrian Martinez decided to enter the transfer portal and continue his football career at Kansas State University. 
+
+Now, Nebraska and K-State fans are curious about how the two quarterbacks will compare and where Martinez will land measured next to other Big 12 quarterbacks. 
+
+The first metric used to compare Martinez and Thompson is passing touchdowns per season. Martinez and Thompson are compared to all other Big 12 quarterbacks for the 2021 season. Nebraska and Kansas State fall right next to each other, but Martinez does come out above Thompson, with two more passing touchdowns than Thompson. 
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+adrian <- read_csv("adrianmartinez.csv")
+skylar <- read_csv("skylarthompson.csv")
+skylar2021 <- skylar %>% filter(Year == "2021")
+adrian2021 <- adrian %>% filter(Year == "2021")
+big12QB2021 <- read_csv("Big12QBs.csv")
+```
+
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+alldata <- bind_rows(big12QB2021, adrian2021, skylar2021)
+```
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+ggplot() + 
+  geom_bar(data=alldata, aes(x=reorder(School, `PassingTD`), weight=`PassingTD`)) +
+  geom_bar(data=adrian2021, aes(x=reorder(School, `PassingTD`), weight=`PassingTD`), fill = "red") +
+  geom_bar(data=skylar2021, aes(x=reorder(School, `PassingTD`), weight=`PassingTD`), fill = "purple") +
+  scale_y_continuous(labels=comma) +
+  coord_flip() +
+  labs(title="Martinez and Thompson are Extremely Comparable", subtitle="According to thier 2021 seasons passing touchdowns, they come out right next to each other." , x="School", y="Passing TD's per season", caption="Source: Sports-Reference.com | By Natalie Frick") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    axis.title = element_text(size = 10), 
+    plot.subtitle = element_text(size=12), 
+    panel.grid.minor = element_blank()
+    )
+```
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+big12allyears <- read_csv("Big12AllYears.csv")
+big10allyears <- read_csv("Big10AllYears.csv")
+big102021 <- big10allyears %>% filter(Year == "2021")
+```
+Another way to compare quarterback performance is passing attempts per passing yards. This statistic shows the yards gained by the quarterback per passing attempt. Martinez and Thompson fall in the middle of the pack among the Big 12 and Big 10 quarterbacks, but once again, Martinez is on top.  
+
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+ggplot() + 
+  geom_point(data=big12QB2021, aes(x=PassingAtt, y=PassingYds), color="grey") +
+  geom_point(data=big102021, aes(x=PassingAtt, y=PassingYds), color="grey") +
+  geom_point(data=skylar2021, aes(x=PassingAtt, y=PassingYds), color="purple") + 
+  geom_point(data=adrian2021, aes(x=PassingAtt, y=PassingYds), color="red") +
+  geom_text_repel(data=skylar2021, aes(x=PassingAtt-.03, y=PassingYds+4, label = School)) +
+  geom_text_repel(data=adrian2021, aes(x=PassingAtt-.03, y=PassingYds+4, label = School)) +
+  labs(title="Two Quarterbacks in the Midwest, Who are Extremly Mid", subtitle="Martinez and Thompson fall next to each other again - the middle of the pack." , x="Passing Yards", y="Passing Attempts",caption="Source: Sports-Reference.com | By Natalie Frick") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 17, face = "bold"),
+    axis.title = element_text(size = 12), 
+    plot.subtitle = element_text(size=14), 
+    panel.grid.minor = element_blank()
+    )
+```
+
+
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+adriangamelogs2021 <- read_csv("adrianmartinez2021season.csv") %>% mutate(Date = mdy(Date)) %>% remove_empty(which=c("rows", "cols"))
+skylargamelogs2021 <- read_csv("skylarthompson2021season.csv") %>% mutate(Date = mdy(Date)) %>% remove_empty(which=c("rows", "cols"))
+oklahomastate <- read_csv("OklahomaState2021.csv") %>% remove_empty(which=c("rows", "cols"))
+baylor <- read_csv("baylor2021.csv") %>% mutate(Date = mdy(Date)) %>% remove_empty(which=c("rows", "cols"))
+oklahoma <- read_csv("oklahoma2021.csv") %>% mutate(Date = mdy(Date)) %>% remove_empty(which=c("rows", "cols"))
+iowastate <- read_csv("IowaState2021.csv") %>% mutate(Date = mdy(Date)) %>% remove_empty(which=c("rows", "cols"))
+westvirginia <- read_csv("WestVirginia2021.csv") %>% mutate(Date = mdy(Date)) %>% remove_empty(which=c("rows", "cols"))
+texastech <- read_csv("TexasTech2021.csv") %>% mutate(Date = mdy(Date)) %>% remove_empty(which=c("rows", "cols"))
+texas2021 <- read_csv("Texas2021.csv") %>% mutate(Date = mdy(Date)) %>% remove_empty(which=c("rows", "cols"))
+tcu2021 <- read_csv("TCU2021.csv") %>% mutate(Date = mdy(Date)) %>% remove_empty(which=c("rows", "cols"))
+kansas2021 <- read_csv("Kansas2021.csv") %>% mutate(Date = mdy(Date)) %>% remove_empty(which=c("rows", "cols"))
+
+teams <- bind_rows(baylor, oklahoma, iowastate, westvirginia, texastech, texas2021, tcu2021, kansas2021)
+```
+
+Lastly, we are going to compare the two quarterbacks using the statistic of passing attempts per game. We are going to take a look at the 2021 season. For this statistic Martinez and Thompson are being compared to other Big 12 quarterbacks. Martinez and Thompson seem to be quite average, but it looks like Thompson is a bit more below average than Martinez. On top of that, Martinez seems to be a more consistent and reliable than Thompson when it comes to passing attempts. 
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+ggplot() + 
+  geom_step(data=teams, aes(x=Date, y=PassingAtt, group=School), color="grey") +
+  geom_step(data=skylargamelogs2021, aes(x=Date, y=PassingAtt, group=School), color="purple") + 
+  geom_step(data=adriangamelogs2021, aes(x=Date, y=PassingAtt, group=School), color="red") +
+  labs(title="Martinez is More Consistant", subtitle="When it comes to passing attempts per game, Martinez is more reliable." , x="Games", y="Passing Attempts",caption="Source: Sports-Reference.com | By Natalie Frick") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 20, face = "bold"),
+    axis.title = element_text(size = 12), 
+    plot.subtitle = element_text(size=14), 
+    panel.grid.minor = element_blank()
+    )
+```
+After reviewing all of this information, I come back to the original question: Will Adrian Martinez let K-State fans down? Well, if we are only comparing him to Skylar Thompson, then I think fans will be pleasantly surprised. In all of the statistics I reviewed, Martinez is better than Thompson, but as a person who has had Martinez on their university's team, I would warn K-State fans to not expect a winning season. 
+
+
+
+The code for this post can be found [here](https://github.com/nataliefrick6/ProjectNotebooks/blob/main/Project%20number%201.Rmd). 
