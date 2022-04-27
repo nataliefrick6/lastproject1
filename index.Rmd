@@ -1,0 +1,130 @@
+---
+title: Did the Best KU Basketball Team Win the National Championship?
+author: Natalie Frick
+date: '2022-04-27'
+slug: did-the-best-ku-basketball-team-win-the-national-championship
+categories: []
+tags: []
+---
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+library(tidyverse)
+library(gt)
+library(scales)
+library(ggalt)
+library(ggplot2)
+library(ggrepel)
+```
+The University of Kansas men's basketball team won the 2022 NCAA Championship. The last time the Jayhawks won a national championship was in 2008. Leading up to this year's championship game, and even during the game, basketball fans were curious to see what the outcome would be. Even KU fans were not entirely confident in their team, many believing KU would win by a landslide or choke and lose -- no in between. The Jayhawks are known for their basketball team and have gone far in the NCAA Tournament for many years. This led me to the question: did the best KU team win the NCAA Championship? 
+
+To determine if this year's team was the best, we have to compare them to past seasons. I pulled the last 22 seasons worth of data to compare. 
+
+First, I want to look at field goal percentage and three point percentage. Let's see how well the teams are shooting the basketball and how often they are making shots.  
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+allstats <- read_csv("allstats.csv")
+```
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+allstatssorted <- allstats %>%
+  filter(School == "Kansas") %>%
+  arrange(desc(FieldGoalPCT))
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+allstatssorted %>%
+  select(School, FieldGoalPCT, ThreePointPct, Season) %>%
+  gt() %>%
+  cols_label(
+    FieldGoalPCT = "Field Goal Percent" ,
+    ThreePointPct = "3 Point Percent"
+  )%>%
+  tab_header(
+    title = "The 2011 team is tied for first with the 2008 National Champions.",
+    subtitle = "The 2022 team is ranked 14th out of 22 seasons."
+  ) %>%
+  tab_style(
+    style = cell_text(color = "black", weight = "bold", align = "left"), 
+    locations = cells_title("title")
+  ) %>% tab_style(
+    style = cell_text(color = "black", align = "left"),
+    locations = cells_title("subtitle")
+  ) %>%
+  tab_source_note(
+    source_note = md("**By:** Natalie Frick  |  **Source:** Basketball-Reference.com")
+  )
+```
+
+2008 being tied for first is no shocker considering they also won the national championship that year. The 2011 team tied for first is more of a surprise because they only made it to the Elite 8 in the NCAA tournament. I also want to take note of the 2002 season since they are behind by only .002 percent. 
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+allstatssorted2 <- allstats %>%
+  filter(School == "Kansas")
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+season22 <- allstatssorted2 %>%
+  filter(Season == "2022")
+season08 <- allstatssorted2 %>%
+  filter(Season == "2008")
+season03 <- allstatssorted2 %>%
+  filter(Season == "2003")
+season11 <- allstatssorted2 %>%
+  filter(Season == "2011")
+season02 <- allstatssorted2 %>%
+  filter(Season == "2002")
+
+```
+ 
+Next, I looked at total wins and win percentage from each season. 
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+ggplot() +
+  geom_point(data=allstatssorted2, aes(x=OverallWins, y=WinPct), color = "grey") +
+  geom_point(data=season22, aes(x=OverallWins, y=WinPct), color= "black") +
+  geom_point(data=season08, aes(x=OverallWins, y=WinPct), color= "red") +
+  geom_point(data=season02, aes(x=OverallWins, y=WinPct), color= "blue") +
+  geom_point(data=season11, aes(x=OverallWins, y=WinPct), color= "yellow") +
+  geom_text_repel(data=season22, aes(x=OverallWins+.002, y=WinPct+.002, label = Season))+
+  geom_text_repel(data=season08, aes(x=OverallWins+.0127, y=WinPct+.004, label = Season))+
+  geom_text_repel(data=season11, aes(x=OverallWins+.002, y=WinPct+.002, label = Season))+
+  geom_text_repel(data=season02, aes(x=OverallWins+.002, y=WinPct+.002, label = Season))+
+  labs(title="The 2008 team proves they earned their Championship title.", subtitle="2011 and 2003 teams stay consistent with the championship winning teams." , x="Total Wins", y="Win Percentage",caption="Source: Basketball-Reference.com | By Natalie Frick") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    axis.title = element_text(size = 15), 
+    plot.subtitle = element_text(size=13), 
+    panel.grid.minor = element_blank(),
+    plot.title.position = "plot"
+    )
+```
+
+The 2022 team was top three when it came to total wins, but they do not even make the top five when looking at win percentage. The 2002 and 2011 teams both make it in the top five for Win Percentage and Total Wins. 
+
+After looking at total wins and win percentage, I looked at the Simple Rating System of each team. This statistic will take into account point average differential and strength of schedule. This statistic is important because it takes into account if a season's team had easy opponents, which then played a part in how far that team went in the tournament.
+
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+ggplot() + 
+  geom_bar(data=allstatssorted2, aes(x=reorder(Season, `OverallSRS`), weight=`OverallSRS`)) +
+  geom_bar(data=season22, aes(x=reorder(Season, `OverallSRS`), weight=`OverallSRS`), fill = "black") +
+  geom_bar(data=season11, aes(x=reorder(Season, `OverallSRS`), weight=`OverallSRS`), fill = "yellow") +
+  geom_bar(data=season08, aes(x=reorder(Season, `OverallSRS`), weight=`OverallSRS`), fill = "red") +
+  geom_bar(data=season02, aes(x=reorder(Season, `OverallSRS`), weight=`OverallSRS`), fill = "blue") +
+scale_y_continuous(labels=comma) +
+  coord_flip() +
+labs(title="2022 season is ranked 10th out of the last 20 seasons.",
+     subtitle="The 2011 and 2002 seasons rank higher than the 2022 season in both shooting percentage and SRS", x="", y="Simple Rating System", caption="Source: Basketball-Reference.com | By Natalie Frick") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 18, face = "bold"), 
+    axis.title = element_text(size = 8),
+    plot.subtitle = element_text(size = 10),
+    panel.grid.minor = element_blank(),
+    plot.title.position = "plot"
+  )
+```
+
+The 2008 team comes out on top once again and proves they deserved their title. The 2022 team is trailing by a lot. They are ranked 10th while the 2002 and 2011 teams are ranked 5th and 6th. Every chart and graph proves that the 2022 team was a little above average compared to the last 22 seasons and the 2008 team was consistently the best. 
+
+To answer my original question: Did the best KU team win the NCAA Championship? Yes, but it wasn't the 2022 team. It was 14 years ago when the 2008 team won the championship.
+
+The code for this post can be found [here](https://github.com/nataliefrick6/lastproject1/blob/main/Project2Notebook.Rmd)
